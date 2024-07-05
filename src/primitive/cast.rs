@@ -80,8 +80,6 @@ macro_rules! impl_tests {
     };
 }
 
-use std::primitive;
-
 pub(self) use impl_castable;
 pub(self) use impl_tests;
 

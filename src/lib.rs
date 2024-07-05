@@ -1,10 +1,10 @@
 #![feature(const_trait_impl, associated_type_defaults, effects, trait_alias, const_ptr_as_ref, ptr_as_ref_unchecked)]
-#![allow(unused_imports, unused_macros)]
+#![allow(incomplete_features, unused_macros)]
 #![doc = include_str!("../README.md")]
 
 use primitive::{
     cast::Cast,
-    op::binary::{BitAnd, BitOr, BitXor},
+    op::binary::{BitAnd, BitXor},
     Primitive,
 };
 pub use blanket::{PointerExt, PointerMutExt};

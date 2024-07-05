@@ -111,6 +111,7 @@ macro_rules! binary_constrict {
     };
 }
 
+#[allow(unused_imports)]
 pub(self) use binary_constrict;
 
 /// Implements all constrict macros for binary operations.
@@ -130,6 +131,7 @@ macro_rules! impl_constrict_macros {
                     };
                 }
 
+                #[allow(unused_imports)]
                 pub(crate) use [< $target_name:snake >];
             )+
         }
@@ -182,7 +184,6 @@ macro_rules! impl_tests {
         $crate::primitive::item! {
             #[cfg(test)]
             mod tests {
-                use super::BinOp;
                 use super::{
                     $(
                         [< Bit $target_name:camel >],

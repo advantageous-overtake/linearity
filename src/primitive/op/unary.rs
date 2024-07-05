@@ -124,6 +124,7 @@ macro_rules! impl_constrict_macros {
                     };
                 }
 
+                #[allow(unused_imports)]
                 pub(crate) use [< $target_name:snake >];
             )+
         }
@@ -132,6 +133,7 @@ macro_rules! impl_constrict_macros {
 
 unary_list!(impl_constrict_macros);
 
+#[allow(unused_imports)]
 pub(self) use unary_constrict;
 
 macro_rules! impl_tests {
@@ -166,7 +168,6 @@ macro_rules! impl_tests {
         $crate::primitive::item! {
             #[cfg(test)]
             mod tests {
-                use super::UnOp;
                 use super::{
                     $(
                         [< Bit $target_name:camel >],

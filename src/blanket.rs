@@ -1,7 +1,6 @@
 //! Blanket implementation for implementors of the [`super::Linearity`] trait and such.
 
 use crate::Linearity;
-use core::ops::Deref;
 
 /// Extension trait for pointers.
 pub trait PointerExt<T> {

@@ -2,6 +2,7 @@
 name = "linearity"
 description = "Library providing various operations commonly found in branchless programming"
 license = "AGPL-3.0"
+documentation = "https://docs.rs/linearity"
 authors = ["advantageous-overtake"]
 version = "1.0.0"
 edition = "2021"

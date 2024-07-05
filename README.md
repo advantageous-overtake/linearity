@@ -5,6 +5,8 @@ The primary trait is [`Linearity`], it provides facilities for clear and concise
  
 See the totality of the [crate documentation](https://docs.rs/linearity) for more information.
 
+**NOTE:** This library is currently nightly-only, due to the usage of const-traits.
+
 ## Usage
 To use `linearity` in your project, add the following lines to your `Cargo.toml` file:
 

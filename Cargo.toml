@@ -4,7 +4,7 @@ description = "Library providing various operations commonly found in branchless
 license = "AGPL-3.0"
 documentation = "https://docs.rs/linearity"
 authors = ["advantageous-overtake"]
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 
 [dependencies]

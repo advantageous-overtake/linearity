@@ -1,22 +1,38 @@
-#![feature(const_trait_impl, associated_type_defaults, effects, trait_alias, const_ptr_as_ref, ptr_as_ref_unchecked)]
-#![allow(incomplete_features, unused_macros)]
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#![cfg_attr(not(test), no_std)]
+#![deny(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+pub use blanket::{PointerExt, PointerMutExt};
+pub use filter::Filter;
 use primitive::{
     cast::Cast,
     op::binary::{BitAnd, BitXor},
     Primitive,
 };
-pub use blanket::{PointerExt, PointerMutExt};
-pub use filter::Filter;
 
-
-mod filter;
 mod blanket;
+mod filter;
 pub mod primitive;
 
 /// Constant-accelerated trait for various operations commonly found in branchless programming.
-#[const_trait]
 pub trait Linearity: Primitive {
     /// Performs a selection operation between `self` and `target_right` based on the value of `target_dependence`.
     ///
@@ -25,7 +41,7 @@ pub trait Linearity: Primitive {
     /// * `target_dependence` - A boolean value indicating whether to select `self` or `target_right`.
     ///
     /// The function returns the selected value of type `T`.
-    /// 
+    ///
     /// # Examples
     ///
     /// ```
@@ -42,48 +58,46 @@ pub trait Linearity: Primitive {
     #[inline]
     fn select<T>(self, target_right: T, target_dependence: bool) -> T
     where
-        T: ~const Primitive,
-        T: ~const BitXor<Operand = T, Output = T> + ~const BitAnd<Operand = T, Output = T>,
+        T: Primitive,
+        T: BitXor<Operand = T, Output = T> + BitAnd<Operand = T, Output = T>,
 
-        Self: ~const Cast<T>,
-        i8: ~const Cast<T>,
+        Self: Cast<T>,
+        i8: Cast<T>,
     {
         let select_mask: T = Filter::condition(target_dependence);
         let target_left: T = self.cast();
 
         let target_operand = target_left.xor(target_right);
 
-        target_left.xor(
-            target_operand.and(select_mask)
-        )
+        target_left.xor(target_operand.and(select_mask))
     }
 
     /// Performs a filter operation between `self` and `target_dependence`.
-    /// 
+    ///
     /// The function returns the filtered value of type `T`.
-    /// 
+    ///
     /// # Examples
     ///
     /// ```
     /// use linearity::Linearity;
     /// use linearity::Filter;
-    /// 
+    ///
     /// let value = 5;
     /// let target_dependence = Filter::Opaque;
-    /// 
+    ///
     /// let filtered_value: i32 = value.filter(target_dependence);
-    /// 
+    ///
     /// assert_eq!(filtered_value, 0);
     /// ```
     ///
     #[inline]
     fn filter<T>(self, target_dependence: Filter) -> T
     where
-        T: ~const Primitive,
-        T: ~const BitAnd<Operand = T, Output = T>,
+        T: Primitive,
+        T: BitAnd<Operand = T, Output = T>,
 
-        Self: ~const Cast<T>,
-        i8: ~const Cast<T>,
+        Self: Cast<T>,
+        i8: Cast<T>,
     {
         let select_mask: T = target_dependence.mask();
         let target_operand: T = self.cast();
@@ -92,13 +106,13 @@ pub trait Linearity: Primitive {
     }
 }
 
-impl<T> const Linearity for T where T: Primitive {}
+impl<T> Linearity for T where T: Primitive {}
 
 #[cfg(test)]
 mod tests {
     use crate::primitive::primitive_list;
-    use paste::item;
     use const_random::const_random as random;
+    use paste::item;
 
     macro_rules! impl_select {
         (

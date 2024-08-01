@@ -1,3 +1,21 @@
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 //! Abstraction over all primitive types.
 
 pub mod op;
@@ -144,7 +162,7 @@ macro_rules! impl_primitive {
         )+
     ) => {
         $(
-            impl const $target_trait for $target_type {
+            impl $target_trait for $target_type {
                 type Signed = $crate::primitive::signed!($target_type);
                 type Unsigned = $crate::primitive::unsigned!($target_type);
 
@@ -175,13 +193,12 @@ pub(self) use integer_list;
 
 integer_list!(impl_primitive);
 
-#[const_trait]
 /// Primitive trait for all primitive types.
 pub trait Primitive: Operate {
     /// The signed version of the primitive type.
-    type Signed: Primitive + ~const Cast<Self>;
+    type Signed: Primitive + Cast<Self>;
     /// The unsigned version of the primitive type.
-    type Unsigned: Primitive + ~const Cast<Self>;
+    type Unsigned: Primitive + Cast<Self>;
 
     /// The minimum value of the primitive type.
     const MIN: Self;

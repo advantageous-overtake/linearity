@@ -1,3 +1,21 @@
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 //! All unary operation traits and implementations.
 
 use super::{unary_list, Operable};
@@ -11,10 +29,12 @@ macro_rules! unary {
     ) => {
         $crate::primitive::op::item! {
             $(
-                #[const_trait]
+                #[doc = "The `" $target_name "` operation."]
                 pub trait [< Bit $target_name:camel >]: Operable {
-                    type Output = Self;
+                    /// The output type.
+                    type Output;
 
+                    #[doc = "Performs the `" $target_name "` operation."]
                     fn [< $target_name:snake >](self) -> Self::Output;
                 }
             )+
@@ -33,7 +53,7 @@ macro_rules! impl_unary_for {
     ) => {
         $crate::primitive::op::item! {
             $(
-                impl const [< Bit $target_name:camel >] for $target_type {
+                impl [< Bit $target_name:camel >] for $target_type {
                     type Output = $target_type;
 
                     #[inline]
@@ -66,24 +86,25 @@ macro_rules! impl_supertrait {
         )+
     ) => {
         $crate::primitive::op::item! {
-            #[const_trait]
+            /// A supertrait for all unary operations.
             pub trait UnOp:
                 $(
                     [< Bit $target_name:camel >] +
                 )+
                 Operable
             {
-                type Output = Self;
+                /// The output type for all underlying unary operations.
+                type Output;
             }
 
-            impl<T> const UnOp for T
+            impl<T> UnOp for T
             where T:
                 $(
                     [< Bit $target_name:camel >] +
                 )+
                 Operable
             {
-
+                type Output = T;    
             }
         }
     };
@@ -93,48 +114,6 @@ unary_list!(unary);
 unary_list!(impl_unary);
 
 unary_list!(impl_supertrait);
-
-/// Expands to a generic bound constricting the target type to a target unary operation.
-/// 
-/// *NOTE* This is an internal macro, it is not intended for use outside of this crate.
-macro_rules! unary_constrict {
-    (
-        $target_op:ident as $target_type:ty
-    ) => {
-        $crate::primitive::op::item!(
-            $target_type: ~const [< Bit $target_op:camel >]<Output = $target_type>,
-        )
-    };
-}
-
-/// Implements all constrict macros for unary operations.
-macro_rules! impl_constrict_macros {
-    (
-        $(
-            $target_name:ident as $_:tt
-        )+
-    ) => {
-        $crate::primitive::op::item! {
-            $(
-                #[doc = "Constricts the target type to the `" $target_name "` operation."]
-                #[macro_export]
-                macro_rules! [< $target_name:snake >] {
-                    ($target_type:ty) => {
-                        $crate::primitive::op::unary::unary_constrict!($target_name as $target_type);
-                    };
-                }
-
-                #[allow(unused_imports)]
-                pub(crate) use [< $target_name:snake >];
-            )+
-        }
-    };
-}
-
-unary_list!(impl_constrict_macros);
-
-#[allow(unused_imports)]
-pub(self) use unary_constrict;
 
 macro_rules! impl_tests {
     (

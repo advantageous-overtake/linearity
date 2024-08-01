@@ -1,3 +1,21 @@
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 //! Blanket implementation for implementors of the [`super::Linearity`] trait and such.
 
 use crate::Linearity;
@@ -35,10 +53,8 @@ where
 {
     #[inline]
     unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T
-    where 
-        T: Copy
     {
-        *self.select(target_other, target_predicate).as_ref_unchecked()
+        *self.select(target_other, target_predicate).as_ref().unwrap_unchecked()
     }
     
     #[inline]
@@ -60,10 +76,8 @@ where
 {
     #[inline]
     unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T
-    where 
-        T: Copy
     {
-        *self.select(target_other, target_predicate).as_ref_unchecked()
+        *self.select(target_other, target_predicate).as_ref().unwrap_unchecked()
     }
     
     #[inline]

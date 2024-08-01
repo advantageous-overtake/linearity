@@ -1,3 +1,21 @@
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 //! Facilities for casting between primitive types in a generic fashion.
 //! 
 //! See [`Cast`] for more information.
@@ -12,7 +30,7 @@ macro_rules! impl_castable {
         $(,)?
     ) => {
         $(
-            impl const Cast<$target_out> for $target_type {
+            impl Cast<$target_out> for $target_type {
                 #[inline]
                 fn cast(self) -> $target_out {
                     self as $target_out
@@ -86,7 +104,6 @@ pub(self) use impl_tests;
 use crate::primitive::primitive_list;
 
 
-#[const_trait]
 /// A trait for casting between primitive types.
 pub trait Cast<O> {
     /// Explicitly cast the value to the target type.

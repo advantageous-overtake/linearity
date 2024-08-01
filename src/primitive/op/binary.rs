@@ -1,3 +1,21 @@
+/*
+  linearity: A library for branchless programming
+    Copyright (C) 2024  advantageous-overtake
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 //! All binary operation traits and implementations.
 
 use super::{binary_list, Operable};
@@ -11,11 +29,14 @@ macro_rules! binary {
     ) => {
         $crate::primitive::op::item! {
             $(
-                #[const_trait]
+                #[doc = "The `" $target_name "` operation."]
                 pub trait [< Bit $target_name:camel >]: Operable {
-                    type Operand = Self;
-                    type Output = Self;
+                    /// The type of the right operand.
+                    type Operand;
+                    /// The output type.
+                    type Output;
 
+                    #[doc = "Performs the `" $target_name "` operation."]
                     fn [< $target_name:snake >](self, target_right: Self::Operand) -> Self::Output;
                 }
             )+
@@ -34,7 +55,7 @@ macro_rules! impl_binary_for {
     ) => {
         $crate::primitive::op::item! {
             $(
-                impl const [< Bit $target_name:camel >] for $target_type {
+                impl [< Bit $target_name:camel >] for $target_type {
                     type Operand = Self;
                     type Output = Self;
 
@@ -68,7 +89,6 @@ macro_rules! impl_supertrait {
         )+
     ) => {
         $crate::primitive::op::item! {
-            #[const_trait]
             /// Supertrait for all binary operations.
             pub trait BinOp:
                 $(
@@ -76,18 +96,21 @@ macro_rules! impl_supertrait {
                 )+
                 Operable
             {
-                type Operand = Self;
-                type Output = Self;
+                /// The type of the left operand.
+                type Operand;
+                /// The type of the output.
+                type Output;
             }
 
-            impl<T> const BinOp for T
+            impl<T> BinOp for T
             where T:
                 $(
                     [< Bit $target_name:camel >] +
                 )+
                 Operable
             {
-
+                type Operand = T;
+                type Output = T;
             }
         }
     };
@@ -97,49 +120,6 @@ binary_list!(binary);
 binary_list!(impl_binary);
 
 binary_list!(impl_supertrait);
-
-/// Expands to a generic bound constricting the target type to a target binary operation.
-/// 
-/// *NOTE* This is an internal macro, it is not intended for use outside of this crate.
-macro_rules! binary_constrict {
-    (
-        $target_type:ty as $target_name:ident
-    ) => {
-        $crate::primitive::op::item! {
-            $target_type: ~const [< Bit $target_name:camel >]<Operand = $target_type, Output = $target_type>,
-        }
-    };
-}
-
-#[allow(unused_imports)]
-pub(self) use binary_constrict;
-
-/// Implements all constrict macros for binary operations.
-macro_rules! impl_constrict_macros {
-    (
-        $(
-            $target_name:ident as $_:tt
-        )+
-    ) => {
-        $crate::primitive::op::item! {
-            $(
-                #[doc = "Constricts the target type to the `" $target_name "` operation."]
-                #[macro_export]
-                macro_rules! [< $target_name:snake >] {
-                    ($target_type:tt) => {
-                        $crate::primitive::op::binary::binary_constrict!($target_type as $target_name);
-                    };
-                }
-
-                #[allow(unused_imports)]
-                pub(crate) use [< $target_name:snake >];
-            )+
-        }
-    };
-}
-
-binary_list!(impl_constrict_macros);
-
 
 macro_rules! impl_tests {
     (

@@ -32,6 +32,7 @@ mod blanket;
 mod filter;
 pub mod primitive;
 
+pub mod prelude;
 /// Constant-accelerated trait for various operations commonly found in branchless programming.
 pub trait Linearity: Primitive {
     /// Performs a selection operation between `self` and `target_right` based on the value of `target_dependence`.

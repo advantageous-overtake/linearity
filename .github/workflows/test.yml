@@ -20,7 +20,9 @@ jobs:
     strategy:
       matrix:
         toolchain:
-          - nightly
+            - stable
+            - beta
+            - nightly
         os:
           - ubuntu-latest
     steps:

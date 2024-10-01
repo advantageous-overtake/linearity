@@ -1,5 +1,5 @@
 /*
-  linearity: A library for branchless programming
+    linearity: A library for branchless programming
     Copyright (C) 2024  advantageous-overtake
 
     This program is free software: you can redistribute it and/or modify

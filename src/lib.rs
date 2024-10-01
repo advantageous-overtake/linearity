@@ -33,7 +33,17 @@ mod filter;
 pub mod primitive;
 
 pub mod prelude;
-/// Constant-accelerated trait for various operations commonly found in branchless programming.
+
+
+mod private {
+    /// A sealed trait.
+    /// 
+    /// This trait cannot be implemented outside this crate.
+    pub trait Sealed {}
+}
+
+
+/// Trait for various operations commonly found in branchless programming.
 pub trait Linearity: Primitive {
     /// Performs a selection operation between `self` and `target_right` based on the value of `target_dependence`.
     ///
@@ -84,13 +94,11 @@ pub trait Linearity: Primitive {
     /// use linearity::Filter;
     ///
     /// let value = 5;
-    /// let target_dependence = Filter::Opaque;
     ///
-    /// let filtered_value: i32 = value.filter(target_dependence);
+    /// let filtered_value: i32 = value.filter(Filter::Opaque);
     ///
     /// assert_eq!(filtered_value, 0);
     /// ```
-    ///
     #[inline]
     fn filter<T>(self, target_dependence: Filter) -> T
     where

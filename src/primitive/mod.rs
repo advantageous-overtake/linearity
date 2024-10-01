@@ -1,5 +1,5 @@
 /*
-  linearity: A library for branchless programming
+    linearity: A library for branchless programming
     Copyright (C) 2024  advantageous-overtake
 
     This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,8 @@ use paste::item;
 /// ```ignore
 /// $target_macro!($lead_tt as <...>);
 /// ```
+/// 
+/// `<...>` being a placeholder for the tokens to be emitted.
 macro_rules! integer_list {
     ($target_macro:path $(=> $lead_tt:tt)?) => {
         $target_macro!(
@@ -99,7 +101,14 @@ macro_rules! impl_primitive_macros {
                 ($target_type:ty) => { $target_type };
             }
 
-            
+            /// Expands to a boolean literal which denotes whether the type is signed or not.
+            macro_rules! is_signed {
+                $(
+                    ([< i $target_pospend >]) => { true };
+                    ([< u $target_pospend >]) => { false };
+                )*
+            }
+
             /// A macro for generating a list of signed primitive types.
             #[allow(unused_macros)]
             macro_rules! signed_list {
@@ -145,6 +154,7 @@ macro_rules! impl_primitive_macros {
 
         pub(crate) use signed;
         pub(crate) use unsigned;
+        pub(crate) use is_signed;
 
         #[allow(unused_imports)]
         pub(crate) use signed_list;
@@ -162,9 +172,13 @@ macro_rules! impl_primitive {
         )+
     ) => {
         $(
+            impl $crate::private::Sealed for $target_type {}
+
             impl $target_trait for $target_type {
                 type Signed = $crate::primitive::signed!($target_type);
                 type Unsigned = $crate::primitive::unsigned!($target_type);
+
+                const SIGNED: bool =  $crate::primitive::is_signed!($target_type);
 
                 const MIN: Self = <$target_type>::MIN;
                 const MAX: Self = <$target_type>::MAX;
@@ -187,18 +201,44 @@ macro_rules! impl_primitive {
     };
 }
 
+/// Implement a sealed marker trair for a set of types.
+macro_rules! marker {
+    (
+        $target_trait:ident as $($target_type:ident)* 
+    ) => {
+        $(
+            impl $target_trait for $target_type {}
+        )*
+    };
+}
+
 pub(self) use impl_primitive;
 pub(self) use impl_primitive_macros;
 pub(self) use integer_list;
 
 integer_list!(impl_primitive);
 
+
+
+/// Marker trait for signed types.
+pub trait Signed: crate::private::Sealed {}
+
+
+/// Marker trait for unsigned types.
+pub trait Unsigned: crate::private::Sealed {}
+
+signed_list!(marker => Signed);
+unsigned_list!(marker => Unsigned);
+
 /// Primitive trait for all primitive types.
-pub trait Primitive: Operate {
+pub trait Primitive: Operate + crate::private::Sealed {
     /// The signed version of the primitive type.
     type Signed: Primitive + Cast<Self>;
     /// The unsigned version of the primitive type.
     type Unsigned: Primitive + Cast<Self>;
+
+    /// Whether this numeric primitive is singed or not.
+    const SIGNED: bool;
 
     /// The minimum value of the primitive type.
     const MIN: Self;

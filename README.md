@@ -1,5 +1,5 @@
 # Introduction
-`linearity` is a constant-accelerated crate for various operations commonly found in branchless programming.
+`linearity` is a crate for various operations commonly found in branchless programming.
 
 The primary trait is [`Linearity`], it provides facilities for clear and concise branchless programming.
  
@@ -26,6 +26,3 @@ Contributions are welcome! If you find any bugs or have suggestions for improvem
 
 ## License
 This crate is distributed under the terms of the AGPLV3 license. See `LICENSE` for more information.
-
-## Acknowledgements
-We would like to thank all the contributors to the `linearity` crate for their valuable contributions and feedback.

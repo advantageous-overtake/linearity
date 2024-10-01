@@ -17,7 +17,7 @@
 */
 
 //! Facilities for casting between primitive types in a generic fashion.
-//! 
+//!
 //! See [`Cast`] for more information.
 
 macro_rules! impl_castable {
@@ -40,7 +40,7 @@ macro_rules! impl_castable {
     };
     (
         $(
-            $target_type:ty    
+            $target_type:ty
         )+
 
         $(,)?
@@ -82,7 +82,7 @@ macro_rules! impl_tests {
     };
     (
         $(
-            $target_type:ty    
+            $target_type:ty
         )+
 
         $(,)?
@@ -103,15 +103,12 @@ pub(self) use impl_tests;
 
 use crate::primitive::primitive_list;
 
-
 /// A trait for casting between primitive types.
+// FIXME: Make this a sealed trait.
 pub trait Cast<O> {
-    /// Explicitly cast the value to the target type.
-    /// 
-    /// NOTE: This cast may result in truncation of bits.
+    /// Explicitly cast the value to the target type `O`.
     fn cast(self) -> O;
 }
-
 
 primitive_list!(impl_castable);
 

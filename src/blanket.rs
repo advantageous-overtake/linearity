@@ -1,5 +1,5 @@
 /*
-  linearity: A library for branchless programming
+    linearity: A library for branchless programming
     Copyright (C) 2024  advantageous-overtake
 
     This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-//! Blanket implementation for implementors of the [`super::Linearity`] trait and such.
+//! Module for blanket implementations and miscenalleous traits.
 
 use crate::Linearity;
 
@@ -26,18 +26,14 @@ pub trait PointerExt<T> {
     ///
     /// # Safety
     ///
-    /// This function is marked as unsafe because it involves raw pointer manipulation.
-    /// 
-    /// The caller must guarantee that the target pointers are valid.
+    /// Safety constrains are as per [`core::ptr::read`] for both inputs.
     unsafe fn select(self, target_other: Self, target_predicate: bool) -> Self;
 
     /// Selects between two pointers and dereferences the selected pointer.
     ///
     /// # Safety
     ///
-    /// This function is marked as unsafe because it involves raw pointer manipulation and reads from an arbitrary memory location.
-    ///
-    /// The caller must guarantee that the target pointers are valid.
+    /// Safety constrains are as per [`core::ptr::read`] for both inputs.
     unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T;
 }
 
@@ -47,16 +43,15 @@ pub trait PointerMutExt<T>: PointerExt<T> {
 }
 
 impl<T> PointerExt<T> for *const T
-where 
+where
     T: Copy,
-    usize: Linearity
+    usize: Linearity,
 {
     #[inline]
-    unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T
-    {
-        *self.select(target_other, target_predicate).as_ref().unwrap_unchecked()
+    unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T {
+        core::ptr::read(self.select(target_other, target_predicate))
     }
-    
+
     #[inline]
     unsafe fn select(self, target_other: Self, target_dependence: bool) -> Self {
         let target_left = self as usize;
@@ -68,32 +63,22 @@ where
     }
 }
 
-
-impl<T> PointerExt<T> for *mut T
-where 
-    T: Copy,
-    usize: Linearity
-{
+impl<T> PointerExt<T> for *mut T {
     #[inline]
-    unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T
-    {
-        *self.select(target_other, target_predicate).as_ref().unwrap_unchecked()
+    unsafe fn select_deref(self, target_other: Self, target_predicate: bool) -> T {
+        core::ptr::read(self.select(target_other, target_predicate))
     }
-    
+
     #[inline]
     unsafe fn select(self, target_other: Self, target_dependence: bool) -> Self {
         let target_left = self as usize;
         let target_right = target_other as usize;
 
-        let target_outcome = usize::select(target_left, target_right, target_dependence);
+        let target_outcome =
+            <usize as Linearity>::select(target_left, target_right, target_dependence);
 
         target_outcome as Self
     }
 }
 
-impl<T> PointerMutExt<T> for *mut T
-where 
-    *mut T: PointerExt<T>
-{
-    
-}
+impl<T> PointerMutExt<T> for *mut T where *mut T: PointerExt<T> {}
